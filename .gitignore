@@ -1,0 +1,22 @@
+## Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Build results
+[Bb]in/
+[Oo]bj/
+
+## NuGet Packages
+packages/
+*.nupkg
+
+## SQLite database
+*.db
+*.sqlite
+*.sqlite3
+
+## Logs
+*.log
