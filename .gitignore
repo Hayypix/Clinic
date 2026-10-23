@@ -9,14 +9,5 @@
 [Bb]in/
 [Oo]bj/
 
-## NuGet Packages
-packages/
-*.nupkg
-
-## SQLite database
-*.db
-*.sqlite
-*.sqlite3
-
-## Logs
+## Temporary files
 *.log
