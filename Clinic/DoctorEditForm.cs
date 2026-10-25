@@ -23,30 +23,35 @@ namespace Clinic
             });
         }
 
-        // конструктор для редактирования существующего врача
+        // Конструктор для редактирования существующего врача
         public DoctorEditForm(int id) : this()
         {
             doctorId = id;
-            Text = "Изменение данных врача";
+            Text = "Редактирование данных врача";
 
             try
             {
                 using (SQLiteConnection con = Database.GetConnection())
                 {
                     con.Open();
-                    SQLiteCommand cmd = new SQLiteCommand(
-                        "SELECT FullName, Specialty, Phone, Room, Price FROM Doctors WHERE Id = @id", con);
-                    cmd.Parameters.AddWithValue("@id", id);
-
-                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    using (SQLiteCommand cmd = new SQLiteCommand(
+                        "SELECT FullName, Specialty, Phone, Room, Price FROM Doctors WHERE Id = @id", con))
                     {
-                        if (reader.Read())
+                        cmd.Parameters.AddWithValue("@id", id);
+                        using (SQLiteDataReader reader = cmd.ExecuteReader())
                         {
-                            txtName.Text = reader["FullName"].ToString();
-                            cmbSpecialty.Text = reader["Specialty"].ToString();
-                            txtPhone.Text = reader["Phone"].ToString();
-                            txtRoom.Text = reader["Room"].ToString();
-                            txtPrice.Text = Convert.ToDouble(reader["Price"]).ToString("0.##");
+                            if (reader.Read())
+                            {
+                                txtName.Text = reader["FullName"] != DBNull.Value ? reader["FullName"].ToString() : "";
+                                cmbSpecialty.Text = reader["Specialty"] != DBNull.Value ? reader["Specialty"].ToString() : "";
+                                txtPhone.Text = reader["Phone"] != DBNull.Value ? reader["Phone"].ToString() : "";
+                                txtRoom.Text = reader["Room"] != DBNull.Value ? reader["Room"].ToString() : "";
+                                if (reader["Price"] != DBNull.Value)
+                                {
+                                    double p = Convert.ToDouble(reader["Price"]);
+                                    txtPrice.Text = p.ToString("0.##", CultureInfo.InvariantCulture);
+                                }
+                            }
                         }
                     }
                 }
@@ -58,29 +63,37 @@ namespace Clinic
             }
         }
 
-        // сохранить
+        // Сохранение врача
         private void btnSave_Click(object sender, EventArgs e)
         {
-            if (txtName.Text.Trim() == "")
+            string name = txtName.Text.Trim();
+            string specialty = cmbSpecialty.Text.Trim();
+            string phone = txtPhone.Text.Trim();
+            string room = txtRoom.Text.Trim();
+
+            if (string.IsNullOrEmpty(name))
             {
                 MessageBox.Show("Укажите ФИО врача", "Внимание",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtName.Focus();
                 return;
             }
 
-            if (cmbSpecialty.Text.Trim() == "")
+            if (string.IsNullOrEmpty(specialty))
             {
-                MessageBox.Show("Укажите специальность", "Внимание",
+                MessageBox.Show("Укажите специальность врача", "Внимание",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cmbSpecialty.Focus();
                 return;
             }
 
             double price;
-            string priceStr = txtPrice.Text.Trim().Replace(',', '.');
-            if (!double.TryParse(priceStr, NumberStyles.Any, CultureInfo.InvariantCulture, out price) || price <= 0)
+            string priceStr = txtPrice.Text.Trim().Replace(" ", "").Replace("\u00A0", "").Replace(',', '.');
+            if (!double.TryParse(priceStr, NumberStyles.Any, CultureInfo.InvariantCulture, out price) || price < 0 || price > 1000000)
             {
-                MessageBox.Show("Цена приёма указана неверно", "Внимание",
+                MessageBox.Show("Укажите корректную стоимость приёма (от 0 руб.)", "Внимание",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtPrice.Focus();
                 return;
             }
 
@@ -89,28 +102,29 @@ namespace Clinic
                 using (SQLiteConnection con = Database.GetConnection())
                 {
                     con.Open();
-                    SQLiteCommand cmd;
-
-                    if (doctorId == 0)
+                    using (SQLiteCommand cmd = con.CreateCommand())
                     {
-                        cmd = new SQLiteCommand(
-                            "INSERT INTO Doctors (FullName, Specialty, Phone, Room, Price) " +
-                            "VALUES (@n, @s, @p, @r, @c)", con);
-                    }
-                    else
-                    {
-                        cmd = new SQLiteCommand(
-                            "UPDATE Doctors SET FullName = @n, Specialty = @s, Phone = @p, " +
-                            "Room = @r, Price = @c WHERE Id = @id", con);
-                        cmd.Parameters.AddWithValue("@id", doctorId);
-                    }
+                        if (doctorId == 0)
+                        {
+                            cmd.CommandText =
+                                "INSERT INTO Doctors (FullName, Specialty, Phone, Room, Price) " +
+                                "VALUES (@n, @s, @p, @r, @c)";
+                        }
+                        else
+                        {
+                            cmd.CommandText =
+                                "UPDATE Doctors SET FullName = @n, Specialty = @s, Phone = @p, " +
+                                "Room = @r, Price = @c WHERE Id = @id";
+                            cmd.Parameters.AddWithValue("@id", doctorId);
+                        }
 
-                    cmd.Parameters.AddWithValue("@n", txtName.Text.Trim());
-                    cmd.Parameters.AddWithValue("@s", cmbSpecialty.Text.Trim());
-                    cmd.Parameters.AddWithValue("@p", txtPhone.Text.Trim());
-                    cmd.Parameters.AddWithValue("@r", txtRoom.Text.Trim());
-                    cmd.Parameters.AddWithValue("@c", price);
-                    cmd.ExecuteNonQuery();
+                        cmd.Parameters.AddWithValue("@n", name);
+                        cmd.Parameters.AddWithValue("@s", specialty);
+                        cmd.Parameters.AddWithValue("@p", phone);
+                        cmd.Parameters.AddWithValue("@r", room);
+                        cmd.Parameters.AddWithValue("@c", price);
+                        cmd.ExecuteNonQuery();
+                    }
                 }
 
                 DialogResult = DialogResult.OK;

@@ -11,10 +11,13 @@ namespace Clinic
             InitializeComponent();
         }
 
-        // вход в систему
+        // Вход в систему
         private void btnEnter_Click(object sender, EventArgs e)
         {
-            if (txtLogin.Text.Trim() == "" || txtPass.Text == "")
+            string login = txtLogin.Text.Trim();
+            string pass = txtPass.Text;
+
+            if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(pass))
             {
                 MessageBox.Show("Заполните логин и пароль", "Внимание",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -26,40 +29,43 @@ namespace Clinic
                 using (SQLiteConnection con = Database.GetConnection())
                 {
                     con.Open();
-                    SQLiteCommand cmd = new SQLiteCommand(
-                        "SELECT COUNT(*) FROM Users WHERE Login = @l AND Password = @p", con);
-                    cmd.Parameters.AddWithValue("@l", txtLogin.Text.Trim());
-                    cmd.Parameters.AddWithValue("@p", txtPass.Text);
+                    using (SQLiteCommand cmd = new SQLiteCommand(
+                        "SELECT COUNT(*) FROM Users WHERE Login = @l AND Password = @p", con))
+                    {
+                        cmd.Parameters.AddWithValue("@l", login);
+                        cmd.Parameters.AddWithValue("@p", pass);
 
-                    if (Convert.ToInt32(cmd.ExecuteScalar()) > 0)
-                    {
-                        MainForm f = new MainForm(txtLogin.Text.Trim());
-                        Hide();
-                        f.ShowDialog();
-                        Close();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Неверный логин или пароль", "Ошибка",
-                            MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        txtPass.Clear();
+                        if (Convert.ToInt32(cmd.ExecuteScalar()) > 0)
+                        {
+                            MainForm f = new MainForm(login);
+                            Hide();
+                            f.ShowDialog();
+                            Close();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Неверный логин или пароль", "Ошибка",
+                                MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            txtPass.Clear();
+                            txtPass.Focus();
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Ошибка: " + ex.Message, "Ошибка",
+                MessageBox.Show("Ошибка подключения: " + ex.Message, "Ошибка",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        // выход
+        // Выход
         private void btnExit_Click(object sender, EventArgs e)
         {
             Close();
         }
 
-        // показать/скрыть пароль
+        // Показать / скрыть пароль
         private void chkShow_CheckedChanged(object sender, EventArgs e)
         {
             if (chkShow.Checked)

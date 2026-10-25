@@ -44,6 +44,12 @@ CREATE TABLE Appointments (
     Status TEXT NOT NULL DEFAULT 'Запланирован'          -- Запланирован / Проведен / Отменен
 );
 
+-- индексы для ускорения поиска
+CREATE INDEX IF NOT EXISTS idx_appointments_patient ON Appointments(PatientId);
+CREATE INDEX IF NOT EXISTS idx_appointments_doctor ON Appointments(DoctorId);
+CREATE INDEX IF NOT EXISTS idx_appointments_date ON Appointments(Date);
+CREATE INDEX IF NOT EXISTS idx_appointments_status ON Appointments(Status);
+
 INSERT INTO Users (Login, Password) VALUES ('admin', '12345');
 
 INSERT INTO Doctors (FullName, Specialty, Phone, Room, Price) VALUES

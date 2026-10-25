@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Data.SQLite;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace Clinic
@@ -17,7 +18,9 @@ namespace Clinic
             LoadDoctors();
 
             dtpDate.Value = DateTime.Today;
-            dtpTime.Value = DateTime.Today.AddHours(10);
+            // По умолчанию округляем время до следующего часа
+            DateTime defaultTime = DateTime.Today.AddHours(Math.Max(8, Math.Min(18, DateTime.Now.Hour + 1)));
+            dtpTime.Value = defaultTime;
             ShowPrice();
         }
 
@@ -26,12 +29,16 @@ namespace Clinic
             DataTable patients = new DataTable();
             using (SQLiteConnection con = Database.GetConnection())
             using (SQLiteDataAdapter adapter = new SQLiteDataAdapter(
-                "SELECT Id, FullName FROM Patients ORDER BY FullName", con))
+                "SELECT Id, FullName, Phone FROM Patients ORDER BY FullName", con))
             {
                 adapter.Fill(patients);
             }
+
+            // Добавляем телефон для наглядности
+            patients.Columns.Add("DisplayInfo", typeof(string), "FullName + IIF(Phone IS NULL OR Phone = '', '', ' (' + Phone + ')')");
+
             cmbPatient.DataSource = patients;
-            cmbPatient.DisplayMember = "FullName";
+            cmbPatient.DisplayMember = "DisplayInfo";
             cmbPatient.ValueMember = "Id";
         }
 
@@ -45,24 +52,24 @@ namespace Clinic
                 adapter.Fill(doctorsTable);
             }
 
-            // колонка с кратким описанием врача
+            // Колонка с кратким описанием врача
             doctorsTable.Columns.Add("Info", typeof(string),
-                "FullName + ', ' + Specialty + ', каб. ' + Room");
+                "FullName + ' (' + Specialty + ', каб. ' + Room + ')'");
             cmbDoctor.DataSource = doctorsTable;
             cmbDoctor.DisplayMember = "Info";
             cmbDoctor.ValueMember = "Id";
         }
 
-        // показ цены приёма выбранного врача
+        // Показ цены приёма выбранного врача
         private void ShowPrice()
         {
             DataRowView row = cmbDoctor.SelectedItem as DataRowView;
-            if (row != null)
+            if (row != null && row["Price"] != DBNull.Value)
                 price = Convert.ToDouble(row["Price"]);
             else
                 price = 0;
 
-            lblPriceValue.Text = price.ToString("0.##") + " руб.";
+            lblPriceValue.Text = price.ToString("N0", CultureInfo.CurrentCulture) + " руб.";
         }
 
         private void cmbDoctor_SelectedIndexChanged(object sender, EventArgs e)
@@ -70,35 +77,42 @@ namespace Clinic
             ShowPrice();
         }
 
-        // записать пациента на приём
+        // Записать пациента на приём
         private void btnBook_Click(object sender, EventArgs e)
         {
             if (cmbPatient.SelectedItem == null)
             {
-                MessageBox.Show("Выберите пациента", "Внимание",
+                MessageBox.Show("Выберите пациента из списка", "Внимание",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cmbPatient.Focus();
                 return;
             }
 
             if (cmbDoctor.SelectedItem == null)
             {
-                MessageBox.Show("Выберите врача", "Внимание",
+                MessageBox.Show("Выберите врача из списка", "Внимание",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cmbDoctor.Focus();
                 return;
             }
 
             DateTime appointmentDateTime = dtpDate.Value.Date + dtpTime.Value.TimeOfDay;
-            if (appointmentDateTime < DateTime.Now)
+
+            // Разрешаем небольшой люфт 10 минут, если запись оформляется на текущее время
+            if (appointmentDateTime < DateTime.Now.AddMinutes(-10))
             {
-                MessageBox.Show("Нельзя записать на прошедшее время", "Внимание",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
+                if (MessageBox.Show("Выбранная дата и время уже прошли.\nВсё равно оформить запись на это время?",
+                    "Подтверждение", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                {
+                    return;
+                }
             }
 
             if (dtpTime.Value.Hour < 8 || (dtpTime.Value.Hour == 19 && dtpTime.Value.Minute > 0) || dtpTime.Value.Hour > 19)
             {
-                MessageBox.Show("Клиника работает с 8:00 до 19:00", "Внимание",
+                MessageBox.Show("Часы работы клиники: с 08:00 до 19:00", "Внимание",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                dtpTime.Focus();
                 return;
             }
 
@@ -113,30 +127,51 @@ namespace Clinic
                 {
                     con.Open();
 
-                    // проверяем, не занят ли врач в это время
-                    SQLiteCommand check = new SQLiteCommand(
+                    // Проверяем, не занят ли врач в это время (активной записью)
+                    using (SQLiteCommand check = new SQLiteCommand(
                         "SELECT COUNT(*) FROM Appointments " +
-                        "WHERE DoctorId = @d AND Date = @date AND Time = @time AND Status = 'Запланирован'", con);
-                    check.Parameters.AddWithValue("@d", doctorId);
-                    check.Parameters.AddWithValue("@date", date);
-                    check.Parameters.AddWithValue("@time", time);
-
-                    if (Convert.ToInt32(check.ExecuteScalar()) > 0)
+                        "WHERE DoctorId = @d AND Date = @date AND Time = @time AND Status <> 'Отменен'", con))
                     {
-                        MessageBox.Show("Этот врач уже занят в выбранное время", "Внимание",
-                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return;
+                        check.Parameters.AddWithValue("@d", doctorId);
+                        check.Parameters.AddWithValue("@date", date);
+                        check.Parameters.AddWithValue("@time", time);
+
+                        if (Convert.ToInt32(check.ExecuteScalar()) > 0)
+                        {
+                            MessageBox.Show("Выбранный врач уже занят в это время.\nПожалуйста, выберите другое время приёма.",
+                                "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
                     }
 
-                    SQLiteCommand cmd = new SQLiteCommand(
+                    // Проверяем, не записан ли этот пациент уже к другому врачу на это же время
+                    using (SQLiteCommand checkPatient = new SQLiteCommand(
+                        "SELECT COUNT(*) FROM Appointments " +
+                        "WHERE PatientId = @p AND Date = @date AND Time = @time AND Status <> 'Отменен'", con))
+                    {
+                        checkPatient.Parameters.AddWithValue("@p", patientId);
+                        checkPatient.Parameters.AddWithValue("@date", date);
+                        checkPatient.Parameters.AddWithValue("@time", time);
+
+                        if (Convert.ToInt32(checkPatient.ExecuteScalar()) > 0)
+                        {
+                            MessageBox.Show("У данного пациента уже есть активная запись на это же время.",
+                                "Внимание", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+                    }
+
+                    using (SQLiteCommand cmd = new SQLiteCommand(
                         "INSERT INTO Appointments (PatientId, DoctorId, Date, Time, Price, Status) " +
-                        "VALUES (@p, @d, @date, @time, @price, 'Запланирован')", con);
-                    cmd.Parameters.AddWithValue("@p", patientId);
-                    cmd.Parameters.AddWithValue("@d", doctorId);
-                    cmd.Parameters.AddWithValue("@date", date);
-                    cmd.Parameters.AddWithValue("@time", time);
-                    cmd.Parameters.AddWithValue("@price", price);
-                    cmd.ExecuteNonQuery();
+                        "VALUES (@p, @d, @date, @time, @price, 'Запланирован')", con))
+                    {
+                        cmd.Parameters.AddWithValue("@p", patientId);
+                        cmd.Parameters.AddWithValue("@d", doctorId);
+                        cmd.Parameters.AddWithValue("@date", date);
+                        cmd.Parameters.AddWithValue("@time", time);
+                        cmd.Parameters.AddWithValue("@price", price);
+                        cmd.ExecuteNonQuery();
+                    }
                 }
 
                 DialogResult = DialogResult.OK;

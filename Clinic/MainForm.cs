@@ -1,4 +1,6 @@
 using System;
+using System.Drawing;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace Clinic
@@ -6,6 +8,24 @@ namespace Clinic
     public partial class MainForm : Form
     {
         private string currentLogin = "admin";
+
+        // Дочерние формы разделов
+        private AppointmentsForm appointmentsForm;
+        private DoctorsForm doctorsForm;
+        private PatientsForm patientsForm;
+        private ReportsForm reportsForm;
+        private SummaryForm summaryForm;
+
+        private enum NavTab
+        {
+            Appointments,
+            Doctors,
+            Patients,
+            Reports,
+            Summary
+        }
+
+        private NavTab currentTab = NavTab.Appointments;
 
         public MainForm()
         {
@@ -15,67 +35,186 @@ namespace Clinic
         public MainForm(string login) : this()
         {
             currentLogin = login;
-            lblUser.Text = "Администратор: " + login;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(currentLogin))
-                lblUser.Text = "Администратор: " + currentLogin;
+            lblUser.Text = "Администратор: " + currentLogin;
+            lblDate.Text = DateTime.Now.ToString("dd.MM.yyyy", CultureInfo.CurrentCulture);
 
-            RefreshStatistics();
+            // Создаем экземпляры дочерних форм
+            appointmentsForm = new AppointmentsForm();
+            doctorsForm = new DoctorsForm();
+            patientsForm = new PatientsForm();
+            reportsForm = new ReportsForm();
+            summaryForm = new SummaryForm();
+
+            summaryForm.RequestRefreshAll += (s, ev) => RefreshAllMetrics();
+
+            // Центрируем нижний HUD-бар
+            CenterHudBar();
+
+            // Открываем первую вкладку по умолчанию (Записи на приём)
+            SetTab(NavTab.Appointments);
+
+            // Первичное обновление сводки
+            RefreshAllMetrics();
         }
 
-        // обновление сводки на главном окне
-        public void RefreshStatistics()
+        // Центрирование нижнего HUD-бара по горизонтали
+        private void CenterHudBar()
         {
-            Database.ClinicStats stats = Database.GetStats();
-            lblStatDoctors.Text = "• Врачей в штате: " + stats.DoctorsCount;
-            lblStatPatients.Text = "• Пациентов в базе: " + stats.PatientsCount;
-            lblStatPlanned.Text = "• Запланировано приёмов: " + stats.PlannedAppointments;
-            lblStatCompleted.Text = "• Проведено приёмов: " + stats.CompletedAppointments;
-            lblStatRevenue.Text = "• Общая выручка: " + stats.TotalRevenue.ToString("N0") + " руб.";
+            if (panelHud != null && panelBottomBar != null)
+            {
+                panelHud.Left = Math.Max(10, (panelBottomBar.ClientSize.Width - panelHud.Width) / 2);
+                panelHud.Top = 6;
+            }
         }
 
-        private void btnDoctors_Click(object sender, EventArgs e)
+        private void MainForm_Resize(object sender, EventArgs e)
         {
-            DoctorsForm f = new DoctorsForm();
-            f.ShowDialog();
-            RefreshStatistics();
+            CenterHudBar();
         }
 
-        private void btnPatients_Click(object sender, EventArgs e)
+        // Переключение между вкладками через нижний HUD-бар
+        private void SetTab(NavTab tab)
         {
-            PatientsForm f = new PatientsForm();
-            f.ShowDialog();
-            RefreshStatistics();
+            currentTab = tab;
+
+            Form targetForm = null;
+
+            switch (tab)
+            {
+                case NavTab.Appointments:
+                    targetForm = appointmentsForm;
+                    appointmentsForm.FillAppointments();
+                    break;
+                case NavTab.Doctors:
+                    targetForm = doctorsForm;
+                    doctorsForm.FillDoctors();
+                    break;
+                case NavTab.Patients:
+                    targetForm = patientsForm;
+                    patientsForm.FillPatients();
+                    break;
+                case NavTab.Reports:
+                    targetForm = reportsForm;
+                    reportsForm.GenerateReport();
+                    break;
+                case NavTab.Summary:
+                    targetForm = summaryForm;
+                    summaryForm.RefreshData();
+                    break;
+            }
+
+            // Подсветка кнопок нижнего HUD-бара
+            UpdateButtonStyles();
+
+            // Встраивание дочерней формы в panelContent
+            if (targetForm != null)
+            {
+                panelContent.SuspendLayout();
+                panelContent.Controls.Clear();
+
+                targetForm.TopLevel = false;
+                targetForm.FormBorderStyle = FormBorderStyle.None;
+                targetForm.Dock = DockStyle.Fill;
+
+                panelContent.Controls.Add(targetForm);
+                targetForm.Show();
+                panelContent.ResumeLayout();
+            }
+
+            // Обновляем статусную строку внизу
+            RefreshAllMetrics();
         }
 
-        private void btnAppointments_Click(object sender, EventArgs e)
+        // Стили кнопок нижнего HUD-бара
+        private void UpdateButtonStyles()
         {
-            AppointmentsForm f = new AppointmentsForm();
-            f.ShowDialog();
-            RefreshStatistics();
+            Color activeBg = Color.FromArgb(15, 118, 110);    // Медицинский глубокий бирюзовый (#0F766E)
+            Color activeFg = Color.White;
+
+            Color inactiveBg = Color.FromArgb(241, 245, 249);  // Мягкий светлый сланец (#F1F5F9)
+            Color inactiveFg = Color.FromArgb(30, 41, 59);     // Тёмный сланец (#1E293B)
+            Color borderColor = Color.FromArgb(203, 213, 225);
+
+            StyleNavButton(btnNavAppointments, currentTab == NavTab.Appointments, activeBg, activeFg, inactiveBg, inactiveFg, borderColor);
+            StyleNavButton(btnNavDoctors, currentTab == NavTab.Doctors, activeBg, activeFg, inactiveBg, inactiveFg, borderColor);
+            StyleNavButton(btnNavPatients, currentTab == NavTab.Patients, activeBg, activeFg, inactiveBg, inactiveFg, borderColor);
+            StyleNavButton(btnNavReports, currentTab == NavTab.Reports, activeBg, activeFg, inactiveBg, inactiveFg, borderColor);
+            StyleNavButton(btnNavSummary, currentTab == NavTab.Summary, activeBg, activeFg, inactiveBg, inactiveFg, borderColor);
         }
 
-        private void btnRefreshStats_Click(object sender, EventArgs e)
+        private void StyleNavButton(Button btn, bool isActive, Color activeBg, Color activeFg, Color inactiveBg, Color inactiveFg, Color borderColor)
         {
-            RefreshStatistics();
+            if (isActive)
+            {
+                btn.BackColor = activeBg;
+                btn.ForeColor = activeFg;
+                btn.Font = new Font("Segoe UI", 9.25f, FontStyle.Bold);
+                btn.FlatAppearance.BorderSize = 0;
+            }
+            else
+            {
+                btn.BackColor = inactiveBg;
+                btn.ForeColor = inactiveFg;
+                btn.Font = new Font("Segoe UI", 9.25f, FontStyle.Regular);
+                btn.FlatAppearance.BorderSize = 1;
+                btn.FlatAppearance.BorderColor = borderColor;
+                btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(226, 232, 240);
+            }
         }
 
-        // О программе
-        private void btnAbout_Click(object sender, EventArgs e)
+        // Обновление метрик в нижней полосе
+        public void RefreshAllMetrics()
         {
-            MessageBox.Show(
-                "Система управления частной клиникой\nВерсия 1.0",
-                "О программе",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Information);
+            try
+            {
+                Database.ClinicStats stats = Database.GetStats();
+                lblStatusMetrics.Text = string.Format(
+                    "👨‍⚕️ Врачей: {0}  |  👥 Пациентов: {1}  |  📅 Приёмов сегодня: {2}  |  💰 Выручка: {3} руб.",
+                    stats.DoctorsCount, stats.PatientsCount, stats.TodayAppointments, stats.TotalRevenue.ToString("N0", CultureInfo.CurrentCulture));
+            }
+            catch
+            {
+            }
         }
 
+        // Обработчики кнопок HUD-бара
+        private void btnNavAppointments_Click(object sender, EventArgs e)
+        {
+            SetTab(NavTab.Appointments);
+        }
+
+        private void btnNavDoctors_Click(object sender, EventArgs e)
+        {
+            SetTab(NavTab.Doctors);
+        }
+
+        private void btnNavPatients_Click(object sender, EventArgs e)
+        {
+            SetTab(NavTab.Patients);
+        }
+
+        private void btnNavReports_Click(object sender, EventArgs e)
+        {
+            SetTab(NavTab.Reports);
+        }
+
+        private void btnNavSummary_Click(object sender, EventArgs e)
+        {
+            SetTab(NavTab.Summary);
+        }
+
+        // Выход из программы
         private void btnExit_Click(object sender, EventArgs e)
         {
-            Close();
+            if (MessageBox.Show("Вы действительно хотите завершить работу с системой клиники?",
+                "Выход из системы", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                Close();
+            }
         }
     }
 }

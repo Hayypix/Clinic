@@ -24,215 +24,282 @@ namespace Clinic
 
         private void InitializeComponent()
         {
-            this.lblHeader = new System.Windows.Forms.Label();
-            this.btnDoctors = new System.Windows.Forms.Button();
-            this.btnPatients = new System.Windows.Forms.Button();
-            this.btnAppointments = new System.Windows.Forms.Button();
-            this.btnAbout = new System.Windows.Forms.Button();
+            this.panelTopHeader = new System.Windows.Forms.Panel();
             this.btnExit = new System.Windows.Forms.Button();
+            this.lblDate = new System.Windows.Forms.Label();
             this.lblUser = new System.Windows.Forms.Label();
-            this.grpStats = new System.Windows.Forms.GroupBox();
-            this.lblStatRevenue = new System.Windows.Forms.Label();
-            this.lblStatCompleted = new System.Windows.Forms.Label();
-            this.lblStatPlanned = new System.Windows.Forms.Label();
-            this.lblStatPatients = new System.Windows.Forms.Label();
-            this.lblStatDoctors = new System.Windows.Forms.Label();
-            this.btnRefreshStats = new System.Windows.Forms.Button();
-            this.grpStats.SuspendLayout();
+            this.lblSubtitle = new System.Windows.Forms.Label();
+            this.lblAppTitle = new System.Windows.Forms.Label();
+            this.panelContent = new System.Windows.Forms.Panel();
+            this.panelBottomBar = new System.Windows.Forms.Panel();
+            this.statusStripBottom = new System.Windows.Forms.StatusStrip();
+            this.lblStatusMetrics = new System.Windows.Forms.ToolStripStatusLabel();
+            this.lblStatusSpring = new System.Windows.Forms.ToolStripStatusLabel();
+            this.lblStatusDb = new System.Windows.Forms.ToolStripStatusLabel();
+            this.panelHud = new System.Windows.Forms.Panel();
+            this.btnNavSummary = new System.Windows.Forms.Button();
+            this.btnNavReports = new System.Windows.Forms.Button();
+            this.btnNavPatients = new System.Windows.Forms.Button();
+            this.btnNavDoctors = new System.Windows.Forms.Button();
+            this.btnNavAppointments = new System.Windows.Forms.Button();
+            this.panelTopHeader.SuspendLayout();
+            this.panelBottomBar.SuspendLayout();
+            this.statusStripBottom.SuspendLayout();
+            this.panelHud.SuspendLayout();
             this.SuspendLayout();
             // 
-            // lblHeader
+            // panelTopHeader
             // 
-            this.lblHeader.AutoSize = true;
-            this.lblHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblHeader.Location = new System.Drawing.Point(26, 25);
-            this.lblHeader.Name = "lblHeader";
-            this.lblHeader.Size = new System.Drawing.Size(320, 24);
-            this.lblHeader.TabIndex = 0;
-            this.lblHeader.Text = "Система управления клиникой";
-            // 
-            // btnDoctors
-            // 
-            this.btnDoctors.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnDoctors.Location = new System.Drawing.Point(30, 75);
-            this.btnDoctors.Name = "btnDoctors";
-            this.btnDoctors.Size = new System.Drawing.Size(280, 50);
-            this.btnDoctors.TabIndex = 1;
-            this.btnDoctors.Text = "Врачи";
-            this.btnDoctors.UseVisualStyleBackColor = true;
-            this.btnDoctors.Click += new System.EventHandler(this.btnDoctors_Click);
-            // 
-            // btnPatients
-            // 
-            this.btnPatients.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnPatients.Location = new System.Drawing.Point(30, 135);
-            this.btnPatients.Name = "btnPatients";
-            this.btnPatients.Size = new System.Drawing.Size(280, 50);
-            this.btnPatients.TabIndex = 2;
-            this.btnPatients.Text = "Пациенты";
-            this.btnPatients.UseVisualStyleBackColor = true;
-            this.btnPatients.Click += new System.EventHandler(this.btnPatients_Click);
-            // 
-            // btnAppointments
-            // 
-            this.btnAppointments.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnAppointments.Location = new System.Drawing.Point(30, 195);
-            this.btnAppointments.Name = "btnAppointments";
-            this.btnAppointments.Size = new System.Drawing.Size(280, 50);
-            this.btnAppointments.TabIndex = 3;
-            this.btnAppointments.Text = "Записи на приём";
-            this.btnAppointments.UseVisualStyleBackColor = true;
-            this.btnAppointments.Click += new System.EventHandler(this.btnAppointments_Click);
-            // 
-            // btnAbout
-            // 
-            this.btnAbout.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnAbout.Location = new System.Drawing.Point(30, 255);
-            this.btnAbout.Name = "btnAbout";
-            this.btnAbout.Size = new System.Drawing.Size(280, 42);
-            this.btnAbout.TabIndex = 4;
-            this.btnAbout.Text = "О программе";
-            this.btnAbout.UseVisualStyleBackColor = true;
-            this.btnAbout.Click += new System.EventHandler(this.btnAbout_Click);
+            this.panelTopHeader.BackColor = System.Drawing.Color.White;
+            this.panelTopHeader.Controls.Add(this.btnExit);
+            this.panelTopHeader.Controls.Add(this.lblDate);
+            this.panelTopHeader.Controls.Add(this.lblUser);
+            this.panelTopHeader.Controls.Add(this.lblSubtitle);
+            this.panelTopHeader.Controls.Add(this.lblAppTitle);
+            this.panelTopHeader.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelTopHeader.Location = new System.Drawing.Point(0, 0);
+            this.panelTopHeader.Name = "panelTopHeader";
+            this.panelTopHeader.Size = new System.Drawing.Size(1024, 52);
+            this.panelTopHeader.TabIndex = 0;
             // 
             // btnExit
             // 
-            this.btnExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnExit.Location = new System.Drawing.Point(30, 307);
+            this.btnExit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnExit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnExit.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnExit.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(71)))), ((int)(((byte)(85)))), ((int)(((byte)(105)))));
+            this.btnExit.Location = new System.Drawing.Point(934, 11);
             this.btnExit.Name = "btnExit";
-            this.btnExit.Size = new System.Drawing.Size(280, 42);
-            this.btnExit.TabIndex = 5;
+            this.btnExit.Size = new System.Drawing.Size(78, 28);
+            this.btnExit.TabIndex = 4;
             this.btnExit.Text = "Выход";
             this.btnExit.UseVisualStyleBackColor = true;
             this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
+            // lblDate
+            // 
+            this.lblDate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblDate.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblDate.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(116)))), ((int)(((byte)(139)))));
+            this.lblDate.Location = new System.Drawing.Point(800, 16);
+            this.lblDate.Name = "lblDate";
+            this.lblDate.Size = new System.Drawing.Size(120, 20);
+            this.lblDate.TabIndex = 3;
+            this.lblDate.Text = "26.10.2026";
+            this.lblDate.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // lblUser
             // 
+            this.lblUser.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lblUser.AutoSize = true;
-            this.lblUser.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblUser.Location = new System.Drawing.Point(27, 375);
+            this.lblUser.Font = new System.Drawing.Font("Segoe UI Semibold", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblUser.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+            this.lblUser.Location = new System.Drawing.Point(620, 18);
             this.lblUser.Name = "lblUser";
-            this.lblUser.Size = new System.Drawing.Size(148, 15);
-            this.lblUser.TabIndex = 6;
+            this.lblUser.Size = new System.Drawing.Size(150, 15);
+            this.lblUser.TabIndex = 2;
             this.lblUser.Text = "Администратор: admin";
             // 
-            // grpStats
+            // lblSubtitle
             // 
-            this.grpStats.Controls.Add(this.btnRefreshStats);
-            this.grpStats.Controls.Add(this.lblStatRevenue);
-            this.grpStats.Controls.Add(this.lblStatCompleted);
-            this.grpStats.Controls.Add(this.lblStatPlanned);
-            this.grpStats.Controls.Add(this.lblStatPatients);
-            this.grpStats.Controls.Add(this.lblStatDoctors);
-            this.grpStats.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.grpStats.Location = new System.Drawing.Point(340, 75);
-            this.grpStats.Name = "grpStats";
-            this.grpStats.Size = new System.Drawing.Size(305, 274);
-            this.grpStats.TabIndex = 7;
-            this.grpStats.TabStop = false;
-            this.grpStats.Text = "Статистика клиники";
+            this.lblSubtitle.AutoSize = true;
+            this.lblSubtitle.Font = new System.Drawing.Font("Segoe UI", 8.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblSubtitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(116)))), ((int)(((byte)(139)))));
+            this.lblSubtitle.Location = new System.Drawing.Point(16, 29);
+            this.lblSubtitle.Name = "lblSubtitle";
+            this.lblSubtitle.Size = new System.Drawing.Size(227, 15);
+            this.lblSubtitle.TabIndex = 1;
+            this.lblSubtitle.Text = "Информационная система управления";
             // 
-            // lblStatRevenue
+            // lblAppTitle
             // 
-            this.lblStatRevenue.AutoSize = true;
-            this.lblStatRevenue.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblStatRevenue.Location = new System.Drawing.Point(15, 175);
-            this.lblStatRevenue.Name = "lblStatRevenue";
-            this.lblStatRevenue.Size = new System.Drawing.Size(145, 15);
-            this.lblStatRevenue.TabIndex = 4;
-            this.lblStatRevenue.Text = "• Выручка: 0 руб.";
+            this.lblAppTitle.AutoSize = true;
+            this.lblAppTitle.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblAppTitle.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(118)))), ((int)(((byte)(110)))));
+            this.lblAppTitle.Location = new System.Drawing.Point(15, 7);
+            this.lblAppTitle.Name = "lblAppTitle";
+            this.lblAppTitle.Size = new System.Drawing.Size(268, 21);
+            this.lblAppTitle.TabIndex = 0;
+            this.lblAppTitle.Text = "Медицинский центр «Здоровье»";
             // 
-            // lblStatCompleted
+            // panelContent
             // 
-            this.lblStatCompleted.AutoSize = true;
-            this.lblStatCompleted.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblStatCompleted.Location = new System.Drawing.Point(15, 140);
-            this.lblStatCompleted.Name = "lblStatCompleted";
-            this.lblStatCompleted.Size = new System.Drawing.Size(155, 15);
-            this.lblStatCompleted.TabIndex = 3;
-            this.lblStatCompleted.Text = "• Проведено приёмов: 0";
+            this.panelContent.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(250)))), ((int)(((byte)(252)))));
+            this.panelContent.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelContent.Location = new System.Drawing.Point(0, 52);
+            this.panelContent.Name = "panelContent";
+            this.panelContent.Size = new System.Drawing.Size(1024, 538);
+            this.panelContent.TabIndex = 1;
             // 
-            // lblStatPlanned
+            // panelBottomBar
             // 
-            this.lblStatPlanned.AutoSize = true;
-            this.lblStatPlanned.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblStatPlanned.Location = new System.Drawing.Point(15, 105);
-            this.lblStatPlanned.Name = "lblStatPlanned";
-            this.lblStatPlanned.Size = new System.Drawing.Size(167, 15);
-            this.lblStatPlanned.TabIndex = 2;
-            this.lblStatPlanned.Text = "• Запланировано приёмов: 0";
+            this.panelBottomBar.BackColor = System.Drawing.Color.White;
+            this.panelBottomBar.Controls.Add(this.statusStripBottom);
+            this.panelBottomBar.Controls.Add(this.panelHud);
+            this.panelBottomBar.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panelBottomBar.Location = new System.Drawing.Point(0, 590);
+            this.panelBottomBar.Name = "panelBottomBar";
+            this.panelBottomBar.Size = new System.Drawing.Size(1024, 76);
+            this.panelBottomBar.TabIndex = 2;
             // 
-            // lblStatPatients
+            // statusStripBottom
             // 
-            this.lblStatPatients.AutoSize = true;
-            this.lblStatPatients.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblStatPatients.Location = new System.Drawing.Point(15, 70);
-            this.lblStatPatients.Name = "lblStatPatients";
-            this.lblStatPatients.Size = new System.Drawing.Size(151, 15);
-            this.lblStatPatients.TabIndex = 1;
-            this.lblStatPatients.Text = "• Пациентов в базе: 0";
+            this.statusStripBottom.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(250)))), ((int)(((byte)(252)))));
+            this.statusStripBottom.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.lblStatusMetrics,
+            this.lblStatusSpring,
+            this.lblStatusDb});
+            this.statusStripBottom.Location = new System.Drawing.Point(0, 52);
+            this.statusStripBottom.Name = "statusStripBottom";
+            this.statusStripBottom.Size = new System.Drawing.Size(1024, 24);
+            this.statusStripBottom.TabIndex = 1;
             // 
-            // lblStatDoctors
+            // lblStatusMetrics
             // 
-            this.lblStatDoctors.AutoSize = true;
-            this.lblStatDoctors.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.lblStatDoctors.Location = new System.Drawing.Point(15, 35);
-            this.lblStatDoctors.Name = "lblStatDoctors";
-            this.lblStatDoctors.Size = new System.Drawing.Size(126, 15);
-            this.lblStatDoctors.TabIndex = 0;
-            this.lblStatDoctors.Text = "• Врачей в штате: 0";
+            this.lblStatusMetrics.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblStatusMetrics.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(41)))), ((int)(((byte)(59)))));
+            this.lblStatusMetrics.Name = "lblStatusMetrics";
+            this.lblStatusMetrics.Size = new System.Drawing.Size(370, 19);
+            this.lblStatusMetrics.Text = "Врачей: 0  |  Пациентов: 0  |  Приёмов: 0  |  Выручка: 0 руб.";
             // 
-            // btnRefreshStats
+            // lblStatusSpring
             // 
-            this.btnRefreshStats.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnRefreshStats.Location = new System.Drawing.Point(18, 220);
-            this.btnRefreshStats.Name = "btnRefreshStats";
-            this.btnRefreshStats.Size = new System.Drawing.Size(265, 32);
-            this.btnRefreshStats.TabIndex = 5;
-            this.btnRefreshStats.Text = "Обновить показатели";
-            this.btnRefreshStats.UseVisualStyleBackColor = true;
-            this.btnRefreshStats.Click += new System.EventHandler(this.btnRefreshStats_Click);
+            this.lblStatusSpring.Name = "lblStatusSpring";
+            this.lblStatusSpring.Size = new System.Drawing.Size(514, 19);
+            this.lblStatusSpring.Spring = true;
+            // 
+            // lblStatusDb
+            // 
+            this.lblStatusDb.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.lblStatusDb.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(15)))), ((int)(((byte)(118)))), ((int)(((byte)(110)))));
+            this.lblStatusDb.Name = "lblStatusDb";
+            this.lblStatusDb.Size = new System.Drawing.Size(125, 19);
+            this.lblStatusDb.Text = "● SQLite подключена";
+            // 
+            // panelHud
+            // 
+            this.panelHud.BackColor = System.Drawing.Color.Transparent;
+            this.panelHud.Controls.Add(this.btnNavSummary);
+            this.panelHud.Controls.Add(this.btnNavReports);
+            this.panelHud.Controls.Add(this.btnNavPatients);
+            this.panelHud.Controls.Add(this.btnNavDoctors);
+            this.panelHud.Controls.Add(this.btnNavAppointments);
+            this.panelHud.Location = new System.Drawing.Point(107, 6);
+            this.panelHud.Name = "panelHud";
+            this.panelHud.Size = new System.Drawing.Size(810, 42);
+            this.panelHud.TabIndex = 0;
+            // 
+            // btnNavSummary
+            // 
+            this.btnNavSummary.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnNavSummary.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnNavSummary.Font = new System.Drawing.Font("Segoe UI", 9.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnNavSummary.Location = new System.Drawing.Point(648, 2);
+            this.btnNavSummary.Name = "btnNavSummary";
+            this.btnNavSummary.Size = new System.Drawing.Size(155, 38);
+            this.btnNavSummary.TabIndex = 4;
+            this.btnNavSummary.Text = "📋 Сводка";
+            this.btnNavSummary.UseVisualStyleBackColor = true;
+            this.btnNavSummary.Click += new System.EventHandler(this.btnNavSummary_Click);
+            // 
+            // btnNavReports
+            // 
+            this.btnNavReports.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnNavReports.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnNavReports.Font = new System.Drawing.Font("Segoe UI", 9.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnNavReports.Location = new System.Drawing.Point(486, 2);
+            this.btnNavReports.Name = "btnNavReports";
+            this.btnNavReports.Size = new System.Drawing.Size(156, 38);
+            this.btnNavReports.TabIndex = 3;
+            this.btnNavReports.Text = "📊 Отчёты и Excel";
+            this.btnNavReports.UseVisualStyleBackColor = true;
+            this.btnNavReports.Click += new System.EventHandler(this.btnNavReports_Click);
+            // 
+            // btnNavPatients
+            // 
+            this.btnNavPatients.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnNavPatients.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnNavPatients.Font = new System.Drawing.Font("Segoe UI", 9.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnNavPatients.Location = new System.Drawing.Point(324, 2);
+            this.btnNavPatients.Name = "btnNavPatients";
+            this.btnNavPatients.Size = new System.Drawing.Size(156, 38);
+            this.btnNavPatients.TabIndex = 2;
+            this.btnNavPatients.Text = "👥 Пациенты";
+            this.btnNavPatients.UseVisualStyleBackColor = true;
+            this.btnNavPatients.Click += new System.EventHandler(this.btnNavPatients_Click);
+            // 
+            // btnNavDoctors
+            // 
+            this.btnNavDoctors.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnNavDoctors.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnNavDoctors.Font = new System.Drawing.Font("Segoe UI", 9.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnNavDoctors.Location = new System.Drawing.Point(162, 2);
+            this.btnNavDoctors.Name = "btnNavDoctors";
+            this.btnNavDoctors.Size = new System.Drawing.Size(156, 38);
+            this.btnNavDoctors.TabIndex = 1;
+            this.btnNavDoctors.Text = "👨‍⚕️ Врачи";
+            this.btnNavDoctors.UseVisualStyleBackColor = true;
+            this.btnNavDoctors.Click += new System.EventHandler(this.btnNavDoctors_Click);
+            // 
+            // btnNavAppointments
+            // 
+            this.btnNavAppointments.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnNavAppointments.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnNavAppointments.Font = new System.Drawing.Font("Segoe UI", 9.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnNavAppointments.Location = new System.Drawing.Point(0, 2);
+            this.btnNavAppointments.Name = "btnNavAppointments";
+            this.btnNavAppointments.Size = new System.Drawing.Size(156, 38);
+            this.btnNavAppointments.TabIndex = 0;
+            this.btnNavAppointments.Text = "📅 Записи на приём";
+            this.btnNavAppointments.UseVisualStyleBackColor = true;
+            this.btnNavAppointments.Click += new System.EventHandler(this.btnNavAppointments_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(674, 405);
-            this.Controls.Add(this.grpStats);
-            this.Controls.Add(this.lblUser);
-            this.Controls.Add(this.btnExit);
-            this.Controls.Add(this.btnAbout);
-            this.Controls.Add(this.btnAppointments);
-            this.Controls.Add(this.btnPatients);
-            this.Controls.Add(this.btnDoctors);
-            this.Controls.Add(this.lblHeader);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.MaximizeBox = false;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(248)))), ((int)(((byte)(250)))), ((int)(((byte)(252)))));
+            this.ClientSize = new System.Drawing.Size(1024, 666);
+            this.Controls.Add(this.panelContent);
+            this.Controls.Add(this.panelBottomBar);
+            this.Controls.Add(this.panelTopHeader);
+            this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.MinimumSize = new System.Drawing.Size(900, 600);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Частная клиника";
+            this.Text = "Медицинский центр «Здоровье» — Информационная система клиники";
             this.Load += new System.EventHandler(this.MainForm_Load);
-            this.grpStats.ResumeLayout(false);
-            this.grpStats.PerformLayout();
+            this.Resize += new System.EventHandler(this.MainForm_Resize);
+            this.panelTopHeader.ResumeLayout(false);
+            this.panelTopHeader.PerformLayout();
+            this.panelBottomBar.ResumeLayout(false);
+            this.panelBottomBar.PerformLayout();
+            this.statusStripBottom.ResumeLayout(false);
+            this.statusStripBottom.PerformLayout();
+            this.panelHud.ResumeLayout(false);
             this.ResumeLayout(false);
-            this.PerformLayout();
+
         }
 
         #endregion
 
-        private System.Windows.Forms.Label lblHeader;
-        private System.Windows.Forms.Button btnDoctors;
-        private System.Windows.Forms.Button btnPatients;
-        private System.Windows.Forms.Button btnAppointments;
-        private System.Windows.Forms.Button btnAbout;
-        private System.Windows.Forms.Button btnExit;
+        private System.Windows.Forms.Panel panelTopHeader;
+        private System.Windows.Forms.Label lblAppTitle;
+        private System.Windows.Forms.Label lblSubtitle;
         private System.Windows.Forms.Label lblUser;
-        private System.Windows.Forms.GroupBox grpStats;
-        private System.Windows.Forms.Label lblStatRevenue;
-        private System.Windows.Forms.Label lblStatCompleted;
-        private System.Windows.Forms.Label lblStatPlanned;
-        private System.Windows.Forms.Label lblStatPatients;
-        private System.Windows.Forms.Label lblStatDoctors;
-        private System.Windows.Forms.Button btnRefreshStats;
+        private System.Windows.Forms.Label lblDate;
+        private System.Windows.Forms.Button btnExit;
+        private System.Windows.Forms.Panel panelContent;
+        private System.Windows.Forms.Panel panelBottomBar;
+        private System.Windows.Forms.Panel panelHud;
+        private System.Windows.Forms.Button btnNavAppointments;
+        private System.Windows.Forms.Button btnNavDoctors;
+        private System.Windows.Forms.Button btnNavPatients;
+        private System.Windows.Forms.Button btnNavReports;
+        private System.Windows.Forms.Button btnNavSummary;
+        private System.Windows.Forms.StatusStrip statusStripBottom;
+        private System.Windows.Forms.ToolStripStatusLabel lblStatusMetrics;
+        private System.Windows.Forms.ToolStripStatusLabel lblStatusSpring;
+        private System.Windows.Forms.ToolStripStatusLabel lblStatusDb;
     }
 }
